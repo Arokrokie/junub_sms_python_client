@@ -4,13 +4,6 @@
 
 **A lightweight, type-safe Python client for the JunubSMS Bulk SMS API**
 
-[![PyPI version](https://badge.fury.io/py/junub-sms.svg)](https://badge.fury.io/py/junub-sms)
-[![Python versions](https://img.shields.io/pypi/pyversions/junub-sms.svg)](https://pypi.org/project/junub-sms/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Downloads](https://img.shields.io/pypi/dm/junub-sms.svg)](https://pypi.org/project/junub-sms/)
-[![Tests](https://img.shields.io/badge/tests-24%20passing-brightgreen.svg)](https://github.com/yourusername/junub-sms-python-client/actions)
-
 </div>
 
 ---
@@ -41,7 +34,7 @@ JunubSMS Python Client is a **simple, intuitive, and reliable** library for inte
 pip install junub-sms
 
 # Or install from source
-git clone https://github.com/yourusername/junub-sms-python-client.git
+git clone https://github.com/Arokrokie/junub_sms_python_client.git
 cd junub-sms-python-client
 pip install -e .
 ```
