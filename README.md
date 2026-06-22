@@ -2,201 +2,113 @@
 
 # 📱 JunubSMS Python Client
 
-**A lightweight, type-safe Python client for the JunubSMS Bulk SMS API**
+**The easiest way to integrate JunubSMS Bulk SMS into your Python projects.**
 
 </div>
 
 ---
 
-## 📖 Overview
+## ⚡ 3-Step Quick Start
 
-JunubSMS Python Client is a **simple, intuitive, and reliable** library for interacting with the JunubSMS Bulk SMS API. Built with developer experience in mind, it provides a clean interface for sending SMS messages, managing contacts, checking credit, and performing administrative tasks.
-
-### 🎯 Why Use This Library?
-
-| Feature               | Benefit                                 |
-| --------------------- | --------------------------------------- |
-| **🚀 Simple API**     | Send SMS in one line of code            |
-| **📝 Type Hints**     | Full IDE autocomplete support           |
-| **🔒 Error Handling** | Specific exceptions for each error type |
-| **🧪 Tested**         | Comprehensive test coverage             |
-| **⚡ Lightweight**    | Only `requests` dependency              |
-| **📚 Complete**       | All API operations supported            |
-
----
-
-## 🚀 Quick Start
-
-### Installation
-
+### 1. Install the Library
 ```bash
-# Install via pip
 pip install junub-sms
-
-# Or install from source
-git clone https://github.com/Arokrokie/junub_sms_python_client.git
-cd junub-sms-python-client
-pip install -e .
 ```
 
-### Basic Usage
-
-#### Sending SMS
+### 2. Create Your Script (`send_sms.py`)
+Replace `your_username` and `your_password` with your actual JunubSMS credentials.
 
 ```python
 from junub_sms import JunubSMS
 
-# Initialize the client (automatically authenticates and retrieves session token)
-sms = JunubSMS(username="your_username", password="your_password")
-
-try:
-    # Send a single SMS
-    result = sms.send(
-        to="256700000000",
-        msg="Hello from JunubSMS!",
-        sender="MySender"  # Optional: registered sender ID
-    )
-    print(f"Message sent! ID: {result[0]['id']}")
-
-    # Send to multiple recipients
-    results = sms.send(
-        to=["256700000000", "256700000001"],
-        msg="Hello to multiple recipients!",
-        sender="MySender"
-    )
-    for res in results:
-        print(f"Sent to {res['to']} - ID: {res['id']}")
-
-finally:
-    # Always close the session when done
-    sms.close()
-```
-
-#### Using the Context Manager (Recommended)
-
-To avoid manually calling `.close()`, you can use the client as a context manager:
-
-```python
-from junub_sms import JunubSMS
-
+# 1. Connect to JunubSMS (Recommended: use "with" so it closes automatically)
 with JunubSMS(username="your_username", password="your_password") as sms:
-    result = sms.send(to="256700000000", msg="Hello via Context Manager!")
-    print(result)
+    
+    # 2. Send an SMS
+    response = sms.send(
+        to="256700000000",          # Recipient phone number (with country code)
+        msg="Hello from JunubSMS!",  # Message content
+        sender="MyCompany"          # Optional: your approved Sender ID
+    )
+    print(f"✓ Message Sent! ID: {response[0]['id']}")
+    
+    # 3. Check your remaining balance
+    balance_info = sms.get_credit()
+    print(f"✓ Remaining Balance: {balance_info.get('balance')} credits")
+```
+
+### 3. Run It!
+```bash
+python send_sms.py
 ```
 
 ---
 
-## 🛠️ Advanced Features
+## 📖 Common Examples
 
-### Checking Balance & Credits
+### Send to Multiple People at Once
+Pass a list of phone numbers instead of a single string:
+
+```python
+with JunubSMS(username="your_username", password="your_password") as sms:
+    sms.send(
+        to=["256700000000", "256700000001", "256700000002"],
+        msg="Hello everyone!"
+    )
+```
+
+### Check Detailed Account Credit
+Find out your credit limit, how much you have used, and your current balance:
 
 ```python
 with JunubSMS(username="your_username", password="your_password") as sms:
     credit = sms.get_credit()
-    print(f"Credit Limit: {credit.get('limit')}")
-    print(f"Credit Used: {credit.get('used')}")
-    print(f"Remaining Credit: {credit.get('balance')}")
+    print(f"Total Limit: {credit.get('limit')}")
+    print(f"Used So Far: {credit.get('used')}")
+    print(f"Current Balance: {credit.get('balance')}")
 ```
 
-### Checking Delivery Reports & Inbox
+### Checking Sent Messages & Inbox
+Retrieve logs of sent messages, delivery reports, or incoming replies:
 
 ```python
 with JunubSMS(username="your_username", password="your_password") as sms:
-    # Get status of outgoing messages (delivery status)
-    outgoing = sms.get_outgoing_status(limit=50) # default: 100
+    # See sent messages status
+    sent_messages = sms.get_outgoing_status(limit=10)
     
-    # Get incoming messages (received)
-    incoming = sms.get_incoming()
-    
-    # Get inbox messages
-    inbox = sms.get_inbox()
-    
-    # Get sandbox messages
-    sandbox = sms.get_sandbox()
-```
-
-### Managing Contacts & Groups
-
-```python
-with JunubSMS(username="your_username", password="your_password") as sms:
-    # Search contacts by keyword
-    contacts = sms.get_contacts(keyword="John")
-    
-    # Search groups by keyword/name
-    groups = sms.get_groups(keyword="Customers")
-```
-
-### Administrative Operations (Admin Level Only)
-
-If your account has administrative privileges, you can perform administrative tasks:
-
-```python
-with JunubSMS(username="admin_user", password="admin_password") as sms:
-    # Add a new user account
-    sms.add_account(
-        username="new_user", 
-        password="secure_password", 
-        name="John Doe", 
-        email="john@example.com"
-    )
-    
-    # Add credits to an account
-    sms.credit_add(username="new_user", amount=500.0)
-    
-    # Deduct credits from an account
-    sms.credit_deduct(username="new_user", amount=50.0)
-    
-    # View account credit
-    credit_info = sms.credit_view(username="new_user")
-    
-    # Ban/Unban account
-    sms.ban_account(username="new_user")
-    sms.unban_account(username="new_user")
-    
-    # Inject a message directly into the SMS gateway
-    sms.inject_message(
-        sender="System", 
-        msg="System Alert", 
-        recipient="256700000000", 
-        smsc="gateway_route"
-    )
-    
-    # Remove account
-    sms.remove_account(username="new_user")
+    # See incoming messages (replies)
+    replies = sms.get_incoming()
 ```
 
 ---
 
-## ⚠️ Error Handling
-
-The client maps API error codes to specific, descriptive Python exceptions so you can handle different failure scenarios gracefully.
+## 🛡️ Error Handling
+If something goes wrong (e.g., wrong password or no credits left), the library will raise a specific error:
 
 ```python
 from junub_sms import JunubSMS
-from junub_sms.errors import AuthError, CreditError, MessageError, NotFoundError, JunubSMSError
+from junub_sms.errors import AuthError, CreditError, JunubSMSError
 
 try:
-    with JunubSMS(username="user", password="wrong_password") as sms:
-        sms.send(to="256700000000", msg="Hello!")
-except AuthError as e:
-    print(f"Authentication failed: {e.message} (Code: {e.code})")
-except CreditError as e:
-    print(f"Insufficient credits: {e.message} (Code: {e.code})")
-except MessageError as e:
-    print(f"Message failed to send: {e.message} (Code: {e.code})")
-except NotFoundError as e:
-    print(f"Resource not found: {e.message} (Code: {e.code})")
+    with JunubSMS(username="wrong_user", password="password") as sms:
+        sms.send(to="256700000000", msg="Hello")
+except AuthError:
+    print("Oops! Username or password was incorrect.")
+except CreditError:
+    print("Oops! You do not have enough credits to send this message.")
 except JunubSMSError as e:
-    print(f"API Error: {e.message} (Code: {e.code})")
+    print(f"An API error occurred: {e}")
 ```
 
 ---
 
-## 🧪 Running Tests
+## ⚙️ Advanced Features
 
-To run the unit tests, install development dependencies and run `pytest`:
+For advanced requirements (such as managing contacts, user groups, or admin operations like creating user accounts and adding/deducting credits), see the method documentation in [client.py](file:///d:/Target%20Media%20Group/Junub%20SMS%20Python%20Client/junub_sms_python_client/junub_sms/client.py).
 
+### 🧪 Running Tests
+If you are developing this library and want to run tests:
 ```bash
-pip install -r requirements.txt pytest
+pip install pytest
 pytest
 ```
