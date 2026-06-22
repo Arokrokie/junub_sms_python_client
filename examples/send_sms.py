@@ -15,7 +15,7 @@ try:
     # Send SMS
     result = sms.send(
         to="256700000000",
-        message="Hello from JunubSMS!",
+        msg="Hello from JunubSMS!",
         sender="MySender"  # Must be registered
     )
     
